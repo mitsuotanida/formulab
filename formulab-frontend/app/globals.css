@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0A0A0F;
+  --foreground: #F9FAFB;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-border rounded-xl p-6;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:border-primary/50 hover:shadow-neon-primary cursor-pointer;
+  }
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-light text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 hover:shadow-neon-primary disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply bg-surface-2 hover:bg-border text-foreground font-medium py-2.5 px-6 rounded-lg border border-border transition-all duration-200;
+  }
+  .input {
+    @apply w-full bg-surface-2 border border-border rounded-lg px-4 py-3 text-foreground placeholder-foreground-muted focus:outline-none focus:border-primary transition-colors;
+  }
+  .badge-difficulty-easy {
+    @apply bg-accent/20 text-accent text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+  .badge-difficulty-medium {
+    @apply bg-accent-warn/20 text-accent-warn text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+  .badge-difficulty-hard {
+    @apply bg-destructive/20 text-destructive text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+  .badge-type {
+    @apply bg-primary/20 text-primary-light text-xs font-medium px-2.5 py-1 rounded-full;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #13131A; }
+::-webkit-scrollbar-thumb { background: #2A2A3D; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #6366F1; }
