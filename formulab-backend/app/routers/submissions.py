@@ -1,5 +1,5 @@
 import uuid
-from datetime import date
+from datetime import date, datetime
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from app.database import get_db, SessionLocal
@@ -77,15 +77,17 @@ def submit_formulation(
     if not ex:
         raise HTTPException(404, "Ejercicio no encontrado")
 
-    MAX_ATTEMPTS = 3
-    attempt_count = db.query(Submission).filter(
+    MAX_ATTEMPTS_PER_DAY = 3
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    attempts_today = db.query(Submission).filter(
         Submission.user_id == user.id,
         Submission.exercise_id == body.exercise_id,
+        Submission.created_at >= today_start,
     ).count()
-    if attempt_count >= MAX_ATTEMPTS:
+    if attempts_today >= MAX_ATTEMPTS_PER_DAY:
         raise HTTPException(
             status_code=403,
-            detail=f"Has alcanzado el límite de {MAX_ATTEMPTS} intentos para este ejercicio."
+            detail=f"Has alcanzado el límite de {MAX_ATTEMPTS_PER_DAY} intentos diarios para este ejercicio. Vuelve mañana."
         )
 
     sub = Submission(
