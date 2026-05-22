@@ -106,14 +106,14 @@ export default function ExercisePage() {
     <div className="space-y-6 animate-fade-in max-w-4xl">
       <div className="flex items-start gap-4">
         <div className="flex-1">
-          <div className="flex gap-2 mb-2">
+          <div className="flex gap-2 flex-wrap mb-2">
             <span className="badge-type">{TYPE_LABELS[exercise.type]}</span>
             <span className={`badge-difficulty-${exercise.difficulty}`}>{DIFFICULTY_LABELS[exercise.difficulty]}</span>
             <span className="text-xs text-foreground-muted px-2.5 py-1">{DOMAIN_LABELS[exercise.domain]}</span>
             {exercise.ai_generated && <span className="bg-purple-500/20 text-purple-400 text-xs px-2.5 py-1 rounded-full">Generado por IA</span>}
           </div>
           <h1 className="text-xl font-bold">{exercise.title}</h1>
-          <div className="flex gap-4 mt-2 text-xs text-foreground-muted">
+          <div className="flex flex-wrap gap-2 sm:gap-4 mt-2 text-xs text-foreground-muted">
             <span>RAs: {exercise.ra_ids.join(", ")}</span>
             <span>{exercise.hints_count} pistas disponibles</span>
           </div>
@@ -200,9 +200,9 @@ Restricciones:
       {submission && submission.evaluation_status === "complete" && submission.feedback && (
         <div className="space-y-4 animate-slide-up">
           <div className="card">
-            <div className="flex items-center gap-8">
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8">
               <ScoreRing score={submission.score || 0} />
-              <div className="flex-1">
+              <div className="w-full sm:flex-1 text-center sm:text-left">
                 <p className="font-semibold text-lg mb-1">Resultado de la Evaluación</p>
                 <p className="text-foreground-muted text-sm leading-relaxed">{submission.feedback.overall}</p>
                 <div className="flex gap-4 mt-3">
@@ -213,7 +213,7 @@ Restricciones:
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {([
               { key: "variables", label: "Variables de decisión", icon: "🔢" },
               { key: "objective", label: "Función objetivo", icon: "🎯" },

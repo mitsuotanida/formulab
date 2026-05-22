@@ -20,8 +20,8 @@ export default function AdminStudentsPage() {
         <h1 className="text-2xl font-bold">👥 Estudiantes</h1>
         <p className="text-foreground-muted text-sm mt-1">{students.length} estudiantes registrados</p>
       </div>
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="card p-0 overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-border">
               {["Nombre", "Email", "Nivel", "XP", "Racha", "Perfil"].map((h) => (

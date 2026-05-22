@@ -32,12 +32,12 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">🛠️ Panel de Administración</h1>
           <p className="text-foreground-muted text-sm mt-1">Gestión del curso CII 2750 Optimización</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2">
           <button onClick={() => handleExport("/admin/export/students", "formulab_estudiantes.csv")} className="btn-secondary text-sm">
             📥 Exportar estudiantes
           </button>

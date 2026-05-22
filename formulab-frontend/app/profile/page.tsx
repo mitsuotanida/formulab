@@ -29,14 +29,14 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <div className="card flex items-center gap-6">
-        <div className="w-20 h-20 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl font-bold text-primary">
+      <div className="card flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+        <div className="w-20 h-20 shrink-0 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center text-4xl font-bold text-primary">
           {user.name[0].toUpperCase()}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 text-center sm:text-left">
           <h1 className="text-2xl font-bold">{user.name}</h1>
           <p className="text-foreground-muted">{user.email}</p>
-          <div className="flex gap-4 mt-2">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-3 sm:gap-4 mt-2">
             <span className="text-primary font-semibold">{LEVEL_NAMES[user.level]}</span>
             <span className="text-accent font-mono">{user.xp.toLocaleString()} XP</span>
             <span className="text-accent-warn">🔥 {user.streak} días</span>

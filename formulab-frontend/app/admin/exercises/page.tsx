@@ -41,7 +41,7 @@ export default function AdminExercisesPage() {
       {showGen && (
         <div className="card border-primary/30 bg-primary/5 space-y-4">
           <h3 className="font-semibold">Generador de Ejercicios con IA</h3>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
               { label: "Tipo", key: "type", options: [["LP", "Prog. Lineal"], ["MIP", "Prog. Entera Mixta"], ["NLP", "Prog. No Lineal"]] },
               { label: "Dominio", key: "domain", options: Object.entries(DOMAIN_LABELS) },
@@ -65,8 +65,8 @@ export default function AdminExercisesPage() {
         </div>
       )}
 
-      <div className="card p-0 overflow-hidden">
-        <table className="w-full text-sm">
+      <div className="card p-0 overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-border">
               {["Título", "Tipo", "Dificultad", "Dominio", "RAs", "Fuente", "Acciones"].map((h) => (

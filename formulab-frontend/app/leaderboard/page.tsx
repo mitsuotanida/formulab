@@ -20,12 +20,12 @@ export default function LeaderboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">🏆 Ranking</h1>
           <p className="text-foreground-muted text-sm mt-1">Tabla de posiciones de FormuLab</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {(["all_time", "weekly"] as const).map((p) => (
             <button key={p} onClick={() => setPeriod(p)}
               className={clsx("px-4 py-2 rounded-lg text-sm font-medium border transition-all",
@@ -45,7 +45,7 @@ export default function LeaderboardPage() {
         <div className="card p-0 overflow-hidden">
           {entries.map((entry, i) => (
             <div key={entry.user_id} className={clsx(
-              "flex items-center gap-4 px-6 py-4 border-b border-border last:border-0 transition-colors",
+              "flex items-center gap-2 sm:gap-4 px-3 sm:px-6 py-3 sm:py-4 border-b border-border last:border-0 transition-colors",
               entry.user_id === me?.id ? "bg-primary/5" : "hover:bg-surface-2"
             )}>
               <div className="w-8 text-center">
@@ -56,7 +56,7 @@ export default function LeaderboardPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium truncate">{entry.name} {entry.user_id === me?.id && <span className="text-xs text-primary">(tú)</span>}</p>
-                <p className="text-xs text-foreground-muted">{LEVEL_NAMES[entry.level]} · {entry.exercises_completed} ejercicios completados</p>
+                <p className="text-xs text-foreground-muted">{LEVEL_NAMES[entry.level]}<span className="hidden sm:inline"> · {entry.exercises_completed} ejercicios completados</span></p>
               </div>
               <div className="text-right shrink-0">
                 <p className="font-bold font-mono text-accent">{entry.xp.toLocaleString()}</p>

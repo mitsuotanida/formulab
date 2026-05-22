@@ -71,7 +71,7 @@ export default function AdminAnalyticsPage() {
         </table>
       </div>
 
-      <div className="flex gap-4 text-xs">
+      <div className="flex flex-wrap gap-3 text-xs">
         {[["bg-accent/30 text-accent", "≥80% — Logrado"], ["bg-accent-warn/30 text-accent-warn", "40-79% — En progreso"], ["bg-destructive/20 text-destructive", "<40% — Por desarrollar"], ["bg-surface-2 text-foreground-muted", "Sin intentos"]].map(([cls, label]) => (
           <div key={label} className="flex items-center gap-2">
             <div className={`w-8 h-5 rounded ${cls.split(" ")[0]}`} />
