@@ -77,6 +77,17 @@ def submit_formulation(
     if not ex:
         raise HTTPException(404, "Ejercicio no encontrado")
 
+    MAX_ATTEMPTS = 3
+    attempt_count = db.query(Submission).filter(
+        Submission.user_id == user.id,
+        Submission.exercise_id == body.exercise_id,
+    ).count()
+    if attempt_count >= MAX_ATTEMPTS:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Has alcanzado el límite de {MAX_ATTEMPTS} intentos para este ejercicio."
+        )
+
     sub = Submission(
         user_id=user.id,
         exercise_id=body.exercise_id,
