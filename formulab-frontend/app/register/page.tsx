@@ -7,7 +7,7 @@ import { storeSession } from "@/lib/auth";
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
+  const [form, setForm] = useState({ name: "", nickname: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -20,7 +20,12 @@ export default function RegisterPage() {
     if (form.password !== form.confirm) { setError("Las contraseñas no coinciden"); return; }
     setLoading(true); setError("");
     try {
-      const { data } = await api.post("/auth/register", { name: form.name, email: form.email, password: form.password });
+      const { data } = await api.post("/auth/register", {
+        name: form.name,
+        nickname: form.nickname.trim() || undefined,
+        email: form.email,
+        password: form.password,
+      });
       storeSession(data.access_token, data.refresh_token, data.user);
       router.replace("/dashboard");
     } catch (err: unknown) {
@@ -50,20 +55,28 @@ export default function RegisterPage() {
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {[
-              { label: "Nombre completo", name: "name", type: "text", placeholder: "Juan Pérez" },
-              { label: "Email institucional", name: "email", type: "email", placeholder: "juan@mail.udp.cl" },
-              { label: "Contraseña", name: "password", type: "password", placeholder: "••••••••" },
-              { label: "Confirmar contraseña", name: "confirm", type: "password", placeholder: "••••••••" },
-            ].map((f) => (
-              <div key={f.name}>
-                <label className="text-sm text-foreground-muted mb-1.5 block">{f.label}</label>
-                <input
-                  type={f.type} name={f.name} value={form[f.name as keyof typeof form]}
-                  onChange={handleChange} placeholder={f.placeholder} required className="input"
-                />
-              </div>
-            ))}
+            <div>
+              <label className="text-sm text-foreground-muted mb-1.5 block">Nombre completo</label>
+              <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Juan Pérez" required className="input" />
+            </div>
+            <div>
+              <label className="text-sm text-foreground-muted mb-1.5 block">
+                Apodo <span className="text-foreground-muted/60">(cómo te verán en el ranking)</span>
+              </label>
+              <input type="text" name="nickname" value={form.nickname} onChange={handleChange} placeholder="ej: JuanOP, el_tigre, jp99" maxLength={30} className="input" />
+            </div>
+            <div>
+              <label className="text-sm text-foreground-muted mb-1.5 block">Email institucional</label>
+              <input type="email" name="email" value={form.email} onChange={handleChange} placeholder="juan@mail.udp.cl" required className="input" />
+            </div>
+            <div>
+              <label className="text-sm text-foreground-muted mb-1.5 block">Contraseña</label>
+              <input type="password" name="password" value={form.password} onChange={handleChange} placeholder="••••••••" required className="input" />
+            </div>
+            <div>
+              <label className="text-sm text-foreground-muted mb-1.5 block">Confirmar contraseña</label>
+              <input type="password" name="confirm" value={form.confirm} onChange={handleChange} placeholder="••••••••" required className="input" />
+            </div>
             <button type="submit" disabled={loading} className="btn-primary w-full mt-2">
               {loading ? "Creando cuenta..." : "Crear cuenta"}
             </button>

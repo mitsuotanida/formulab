@@ -49,7 +49,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8 animate-fade-in">
       <div>
-        <h1 className="text-2xl font-bold">Hola, {user.name.split(" ")[0]} 👋</h1>
+        <h1 className="text-2xl font-bold">Hola, {user.nickname || user.name.split(" ")[0]} 👋</h1>
         <p className="text-foreground-muted mt-1">Bienvenido a FormuLab — CII 2750 Optimización</p>
       </div>
 

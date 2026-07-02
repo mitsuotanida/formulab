@@ -31,6 +31,8 @@ def get_me(user: User = Depends(get_user), db: Session = Depends(get_db)):
 def update_me(body: UserUpdate, user: User = Depends(get_user), db: Session = Depends(get_db)):
     if body.name:
         user.name = body.name
+    if body.nickname is not None:
+        user.nickname = body.nickname.strip() or None
     if body.password:
         user.password_hash = hash_password(body.password)
     db.commit()
@@ -65,7 +67,7 @@ def leaderboard(
     entries = []
     for rank, (u, completed) in enumerate(rows, start=(page - 1) * per_page + 1):
         entries.append(LeaderboardEntry(
-            rank=rank, user_id=u.id, name=u.name, xp=u.xp, level=u.level,
+            rank=rank, user_id=u.id, name=u.name, nickname=u.nickname, xp=u.xp, level=u.level,
             level_name=get_level_name(u.level), streak=u.streak, exercises_completed=completed or 0,
         ))
 

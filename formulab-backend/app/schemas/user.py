@@ -18,6 +18,7 @@ class UserOut(BaseModel):
     id: uuid.UUID
     email: str
     name: str
+    nickname: Optional[str] = None
     role: str
     xp: int
     level: int
@@ -32,6 +33,7 @@ class UserOut(BaseModel):
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
+    nickname: Optional[str] = None
     password: Optional[str] = None
 
 
@@ -39,6 +41,7 @@ class LeaderboardEntry(BaseModel):
     rank: int
     user_id: uuid.UUID
     name: str
+    nickname: Optional[str] = None
     xp: int
     level: int
     level_name: str

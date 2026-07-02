@@ -24,11 +24,11 @@ def _hash_token(token: str) -> str:
     return hashlib.sha256(token.encode()).hexdigest()
 
 
-def register_user(db: Session, email: str, name: str, password: str) -> User:
+def register_user(db: Session, email: str, name: str, password: str, nickname: str | None = None) -> User:
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         raise ValueError("Email ya registrado")
-    user = User(email=email, name=name, password_hash=hash_password(password))
+    user = User(email=email, name=name, password_hash=hash_password(password), nickname=nickname or None)
     db.add(user)
     db.commit()
     db.refresh(user)

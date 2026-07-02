@@ -52,10 +52,10 @@ export default function LeaderboardPage() {
                 {i < 3 ? <span className="text-xl">{medals[i]}</span> : <span className="text-foreground-muted font-mono text-sm">{entry.rank}</span>}
               </div>
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-lg font-bold text-primary shrink-0">
-                {entry.name[0].toUpperCase()}
+                {(entry.nickname || entry.name)[0].toUpperCase()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{entry.name} {entry.user_id === me?.id && <span className="text-xs text-primary">(tú)</span>}</p>
+                <p className="font-medium truncate">{entry.nickname || entry.name} {entry.user_id === me?.id && <span className="text-xs text-primary">(tú)</span>}</p>
                 <p className="text-xs text-foreground-muted">{LEVEL_NAMES[entry.level]}<span className="hidden sm:inline"> · {entry.exercises_completed} ejercicios completados</span></p>
               </div>
               <div className="text-right shrink-0">

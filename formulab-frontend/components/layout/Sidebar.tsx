@@ -56,7 +56,7 @@ export default function Sidebar() {
         </div>
         {user && (
           <div className="ml-auto text-right">
-            <p className="text-xs font-medium leading-none">{user.name.split(" ")[0]}</p>
+            <p className="text-xs font-medium leading-none">{user.nickname || user.name.split(" ")[0]}</p>
             <p className="text-xs text-accent font-mono mt-0.5">{user.xp.toLocaleString()} XP</p>
           </div>
         )}
@@ -103,7 +103,7 @@ export default function Sidebar() {
         {user && (
           <div className="px-4 py-4 border-b border-border">
             <div className="bg-surface-2 rounded-xl p-3">
-              <p className="font-medium text-sm truncate">{user.name}</p>
+              <p className="font-medium text-sm truncate">{user.nickname || user.name}</p>
               <div className="flex items-center gap-2 mt-1">
                 <span className="text-xs text-primary font-medium">{LEVEL_NAMES[user.level] || "Intern"}</span>
                 <span className="text-foreground-muted text-xs">·</span>

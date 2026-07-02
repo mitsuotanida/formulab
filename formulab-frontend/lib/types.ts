@@ -68,6 +68,7 @@ export interface LeaderboardEntry {
   rank: number;
   user_id: string;
   name: string;
+  nickname?: string;
   xp: number;
   level: number;
   level_name: string;
