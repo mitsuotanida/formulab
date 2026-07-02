@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { getStoredUser } from "@/lib/auth";
-import { LEVEL_NAMES, type Badge } from "@/lib/types";
+import { LEVEL_NAMES, BADGE_NAMES, type Badge } from "@/lib/types";
 import { clsx } from "clsx";
 
 export default function ProfilePage() {
@@ -105,7 +105,7 @@ export default function ProfilePage() {
                 b.earned ? "bg-accent/10 border-accent/30" : "bg-surface-2 border-border opacity-40 grayscale"
               )}>
                 <span className="text-2xl">{b.earned ? "🏅" : "🔒"}</span>
-                <p className="text-xs text-center font-medium leading-tight">{b.name}</p>
+                <p className="text-xs text-center font-medium leading-tight">{BADGE_NAMES[b.name] ?? b.name}</p>
                 {b.earned && <p className="text-xs text-accent">+{b.xp_reward} XP</p>}
               </div>
             ))}

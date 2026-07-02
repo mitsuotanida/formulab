@@ -57,3 +57,15 @@ class LeaderboardResponse(BaseModel):
     total: int
     page: int
     per_page: int
+
+
+class ProgressStats(BaseModel):
+    user_xp: int
+    user_percentile: int
+    count: int
+    min: float
+    q1: float
+    median: float
+    q3: float
+    max: float
+    mean: float

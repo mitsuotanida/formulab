@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: "⚡" },
   { href: "/exercises", label: "Ejercicios", icon: "📐" },
   { href: "/leaderboard", label: "Ranking", icon: "🏆" },
+  { href: "/progress", label: "Progreso", icon: "📈" },
   { href: "/profile", label: "Mi Perfil", icon: "🎖️" },
 ];
 

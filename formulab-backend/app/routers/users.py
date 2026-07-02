@@ -7,7 +7,7 @@ from app.middleware.auth_middleware import get_user, require_teacher
 from app.models.user import User
 from app.models.submission import Submission
 from app.models.badge import UserBadge, Badge
-from app.schemas.user import UserOut, UserUpdate, LeaderboardResponse, LeaderboardEntry, BadgeOut
+from app.schemas.user import UserOut, UserUpdate, LeaderboardResponse, LeaderboardEntry, BadgeOut, ProgressStats
 from app.services.gamification_service import get_level_name
 from app.utils.security import hash_password
 
@@ -72,6 +72,36 @@ def leaderboard(
         ))
 
     return LeaderboardResponse(data=entries, total=total, page=page, per_page=per_page)
+
+
+@router.get("/progress-stats", response_model=ProgressStats)
+def progress_stats(user: User = Depends(get_user), db: Session = Depends(get_db)):
+    students = db.query(User).filter(User.role == "student").all()
+    xp_list = sorted(u.xp for u in students)
+    n = len(xp_list)
+
+    def pct(data: list, p: float) -> float:
+        if not data:
+            return 0.0
+        idx = (len(data) - 1) * p / 100
+        lo = int(idx)
+        hi = min(lo + 1, len(data) - 1)
+        return data[lo] + (data[hi] - data[lo]) * (idx - lo)
+
+    above = sum(1 for x in xp_list if x < user.xp)
+    percentile = round(above / n * 100) if n > 0 else 0
+
+    return ProgressStats(
+        user_xp=user.xp,
+        user_percentile=percentile,
+        count=n,
+        min=float(xp_list[0]) if xp_list else 0.0,
+        q1=pct(xp_list, 25),
+        median=pct(xp_list, 50),
+        q3=pct(xp_list, 75),
+        max=float(xp_list[-1]) if xp_list else 0.0,
+        mean=round(sum(xp_list) / n) if n > 0 else 0.0,
+    )
 
 
 @router.get("", response_model=list[UserOut])

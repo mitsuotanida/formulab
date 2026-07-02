@@ -77,7 +77,21 @@ export interface LeaderboardEntry {
 }
 
 export const LEVEL_NAMES: Record<number, string> = {
-  1: "Intern", 2: "Junior", 3: "Engineer", 4: "Senior", 5: "Staff", 6: "Principal",
+  1: "Pasante", 2: "Analista", 3: "Formulador", 4: "Optimizador", 5: "Especialista", 6: "Maestro",
+};
+
+export const BADGE_NAMES: Record<string, string> = {
+  "First Blood": "Primera Formulación",
+  "LP Master": "Maestro de LP",
+  "MIP Wizard": "Hechicero MIP",
+  "NLP Explorer": "Explorador PNL",
+  "3-Day Streak": "Racha de 3 Días",
+  "Week Warrior": "Guerrero Semanal",
+  "Iron Coder": "Cálculo de Hierro",
+  "Rising Star": "Estrella en Ascenso",
+  "Engineer Badge": "Insignia Formulador",
+  "Perfectionist": "Perfeccionista",
+  "Hard Mode": "Modo Difícil",
 };
 
 export const DIFFICULTY_LABELS: Record<string, string> = {
