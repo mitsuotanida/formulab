@@ -115,6 +115,37 @@ EXERCISES = [
         "reference_solution": {"variables": "xᵢ = componente i del vector (i=1,2,3), xᵢ ≥ 0", "objective": "Min Z = x₁² + x₂² + x₃²  (norma euclídea al cuadrado)", "constraints": "x₁ + x₂ + x₃ = 1  (restricción presupuestaria)\nx₁, x₂, x₃ ≥ 0\nTipo: NLP convexo (objetivo cuadrático convexo, factible convexo)"},
     },
     {
+        "title": "Producción multi-planta multi-período BioFarm Chile",
+        "description": "BioFarm Chile produce tres suplementos — Proteína (P), Vitaminas (V) y Colágeno (C) — en dos plantas: PL1 (Santiago) y PL2 (Antofagasta). La planificación abarca 3 períodos mensuales (t=1: Enero, t=2: Febrero, t=3: Marzo).\n\nCada planta puede operar o no en cada período, incurriendo en un costo fijo mensual si opera: f₁ = $200/mes (PL1) y f₂ = $150/mes (PL2). La capacidad disponible en horas-máquina es Cap₁ = 120 hr/mes y Cap₂ = 100 hr/mes. Se permite mantener inventario al final de cada período. El inventario inicial es cero para todos los productos. Los costos de producción, consumo de horas-máquina, costo de inventario y demandas mensuales se detallan en la tabla.\n\nLa demanda de cada producto debe satisfacerse exactamente en cada mes (combinando producción del período e inventario previo). Formule el modelo MIP que minimiza el costo total (producción + inventario + costo fijo de operación). Defina explícitamente los conjuntos de índices, los parámetros, las variables de decisión, la función objetivo con notación de sumatoria y las restricciones indicando el conjunto de índices sobre el cual aplica cada una.",
+        "data_table": {
+            "headers": ["Parámetro", "Proteína (P)", "Vitaminas (V)", "Colágeno (C)"],
+            "rows": [
+                ["PL1 – Costo prod. ($/u)", "8", "12", "10"],
+                ["PL2 – Costo prod. ($/u)", "10", "9", "11"],
+                ["PL1 – Consumo máq. (hr/u)", "2", "3", "1"],
+                ["PL2 – Consumo máq. (hr/u)", "1", "2", "3"],
+                ["Costo inventario ($/u/mes)", "1", "2", "1,5"],
+                ["Demanda Enero (unid.)", "20", "15", "25"],
+                ["Demanda Febrero (unid.)", "30", "20", "25"],
+                ["Demanda Marzo (unid.)", "25", "18", "30"],
+            ]
+        },
+        "domain": "production",
+        "type": "MIP",
+        "difficulty": "hard",
+        "ra_ids": [1, 2, 3, 4, 5],
+        "hints": [
+            {"order": 1, "text": "Define 3 conjuntos de índices: I={1,2} para plantas, J={P,V,C} para productos, T={1,2,3} para meses. La variable de producción es tridimensional: xᵢⱼₜ."},
+            {"order": 2, "text": "La restricción de capacidad debe enlazar producción con la decisión binaria de operar: Σⱼ rᵢⱼ·xᵢⱼₜ ≤ Capᵢ·yᵢₜ  para todo i∈I, t∈T. Si yᵢₜ=0, la planta no puede producir (Capᵢ actúa como big-M)."},
+            {"order": 3, "text": "El balance de inventario conecta períodos: Iⱼ,ₜ₋₁ + Σᵢ xᵢⱼₜ − Iⱼₜ = dⱼₜ  para todo j∈J, t∈T, con Iⱼ₀ = 0."},
+        ],
+        "reference_solution": {
+            "variables": "Conjuntos:\nI = {1,2}: plantas (PL1-Santiago, PL2-Antofagasta)\nJ = {P,V,C}: productos (Proteína, Vitaminas, Colágeno)\nT = {1,2,3}: períodos (Enero, Febrero, Marzo)\n\nParámetros:\ncᵢⱼ: costo de producir 1 unidad del producto j en planta i ($/u)\nrᵢⱼ: horas-máquina por unidad del producto j en planta i (hr/u)\nCapᵢ: capacidad en horas-máquina de planta i por período\ndⱼₜ: demanda del producto j en período t (unidades)\nhⱼ: costo de inventario del producto j ($/u/mes)\nfᵢ: costo fijo de operación de planta i por período ($)\n\nVariables de decisión:\nxᵢⱼₜ ≥ 0: unidades del producto j producidas en planta i en período t  ∀i∈I, j∈J, t∈T\nIⱼₜ ≥ 0: inventario del producto j al final del período t  ∀j∈J, t∈T\nyᵢₜ ∈ {0,1}: 1 si planta i opera en período t, 0 si no  ∀i∈I, t∈T",
+            "objective": "Min Z = ΣᵢΣⱼΣₜ cᵢⱼ·xᵢⱼₜ  +  ΣⱼΣₜ hⱼ·Iⱼₜ  +  ΣᵢΣₜ fᵢ·yᵢₜ",
+            "constraints": "Σⱼ rᵢⱼ·xᵢⱼₜ ≤ Capᵢ·yᵢₜ   ∀i∈I, t∈T  (capacidad y enlace con operación)\nIⱼ,ₜ₋₁ + Σᵢ xᵢⱼₜ − Iⱼₜ = dⱼₜ   ∀j∈J, t∈T  (balance de inventario, Iⱼ₀=0)\nxᵢⱼₜ ≥ 0   ∀i∈I, j∈J, t∈T\nIⱼₜ ≥ 0   ∀j∈J, t∈T\nyᵢₜ ∈ {0,1}   ∀i∈I, t∈T\nModelo: MIP (variables continuas + binarias, restricciones lineales)"
+        },
+    },
+    {
         "title": "Expansión de capacidad en puertos portuarios",
         "description": "Una empresa importadora de automóviles opera con 3 puertos (I, SA, PM) con capacidades actuales. La demanda aumentará en 20%. Cada puerto puede expandir su capacidad incurriendo en costos fijos (por construir) y costos variables de expansión por unidad adicional. El beneficio por auto transportado es $10.000. Debe decidir qué puertos expandir y cuánto para maximizar el beneficio neto total de transporte.",
         "data_table": {"headers": ["Puerto", "Cap. actual", "Costo fijo ($M)", "Costo variable ($/unid)", "Demanda asignada (actual)"], "rows": [["Iquique (I)", "5.000", "1.000", "1.000", "4.000"], ["San Antonio (SA)", "8.000", "1.800", "3.000", "7.000"], ["P. Montt (PM)", "6.000", "1.000", "1.800", "5.500"]]},

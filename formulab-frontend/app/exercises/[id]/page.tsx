@@ -161,20 +161,30 @@ export default function ExercisePage() {
 
       <div className="card">
         <h3 className="text-sm font-semibold mb-3 text-foreground-muted uppercase tracking-wider">Tu Formulación</h3>
-        <p className="text-xs text-foreground-muted mb-3">Escribe tu modelo completo. Puedes usar notación matemática (ej: x₁, ≤, Σ, Max, Min).</p>
+        <p className="text-xs text-foreground-muted mb-3">Escribe tu modelo completo. Puedes usar notación matemática (ej: x₁, ≤, Σᵢ, ∀i∈I, Max, Min).</p>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          rows={12}
-          placeholder={`Variables de decisión:
-x₁ = ...
-x₂ = ...
+          rows={14}
+          placeholder={`Conjuntos (si aplica):
+I = {1,...,m}: descripción
+J = {1,...,n}: descripción
+
+Parámetros (si aplica):
+cᵢⱼ = costo de ... para i∈I, j∈J
+dⱼ  = demanda de ...
+
+Variables de decisión:
+xᵢⱼ ≥ 0: unidades de j producidas en i   ∀i∈I, j∈J
+yᵢ ∈ {0,1}: 1 si ...
 
 Función objetivo:
-Max Z = ...
+Min Z = ΣᵢΣⱼ cᵢⱼ·xᵢⱼ  +  ...
 
 Restricciones:
-...`}
+Σⱼ aᵢⱼ·xᵢⱼ ≤ bᵢ   ∀i∈I   (descripción)
+Σᵢ xᵢⱼ = dⱼ        ∀j∈J   (descripción)
+xᵢⱼ ≥ 0, yᵢ ∈ {0,1}`}
           className="input font-mono text-sm resize-none"
           disabled={submitting || submission?.evaluation_status === "complete"}
         />
