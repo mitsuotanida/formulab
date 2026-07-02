@@ -1,9 +1,38 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useParams } from "next/navigation";
 import api from "@/lib/api";
 import { DIFFICULTY_LABELS, DOMAIN_LABELS, TYPE_LABELS, type Exercise, type Submission } from "@/lib/types";
 import { clsx } from "clsx";
+import katex from "katex";
+import "katex/dist/katex.min.css";
+
+function escapeHtml(text: string) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+function renderLatexToHtml(input: string): string {
+  const parts = input.split(/(\$\$[\s\S]*?\$\$|\$[^$\n]+?\$)/g);
+  return parts.map((part) => {
+    if (part.startsWith("$$") && part.endsWith("$$") && part.length > 4) {
+      const math = part.slice(2, -2);
+      try {
+        return `<div class="katex-display-wrap my-2 overflow-x-auto">${katex.renderToString(math, { displayMode: true, throwOnError: false })}</div>`;
+      } catch {
+        return `<span class="text-red-400 text-xs font-mono">[Error: ${escapeHtml(math)}]</span>`;
+      }
+    }
+    if (part.startsWith("$") && part.endsWith("$") && part.length > 2) {
+      const math = part.slice(1, -1);
+      try {
+        return katex.renderToString(math, { displayMode: false, throwOnError: false });
+      } catch {
+        return `<span class="text-red-400 text-xs font-mono">[Error: ${escapeHtml(math)}]</span>`;
+      }
+    }
+    return escapeHtml(part).replace(/\n/g, "<br/>");
+  }).join("");
+}
 
 function ScoreRing({ score }: { score: number }) {
   const r = 45;
@@ -58,7 +87,9 @@ export default function ExercisePage() {
   const [revealedHints, setRevealedHints] = useState<Array<{ order: number; text: string }>>([]);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [startTime] = useState(Date.now());
+  const [latexMode, setLatexMode] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const renderedLatex = useMemo(() => renderLatexToHtml(content), [content]);
 
   useEffect(() => {
     api.get(`/exercises/${id}`).then((r) => setExercise(r.data));
@@ -160,34 +191,97 @@ export default function ExercisePage() {
       )}
 
       <div className="card">
-        <h3 className="text-sm font-semibold mb-3 text-foreground-muted uppercase tracking-wider">Tu Formulación</h3>
-        <p className="text-xs text-foreground-muted mb-3">Escribe tu modelo completo. Puedes usar notación matemática (ej: x₁, ≤, Σᵢ, ∀i∈I, Max, Min).</p>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          rows={14}
-          placeholder={`Conjuntos (si aplica):
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-semibold text-foreground-muted uppercase tracking-wider">Tu Formulación</h3>
+          <div className="flex items-center gap-1 bg-surface-2 rounded-lg p-1">
+            <button
+              onClick={() => setLatexMode(false)}
+              className={clsx("text-xs px-3 py-1.5 rounded-md font-medium transition-all", !latexMode ? "bg-surface text-foreground shadow-sm" : "text-foreground-muted hover:text-foreground")}
+            >
+              Texto
+            </button>
+            <button
+              onClick={() => setLatexMode(true)}
+              className={clsx("text-xs px-3 py-1.5 rounded-md font-medium transition-all flex items-center gap-1.5", latexMode ? "bg-primary/20 text-primary shadow-sm border border-primary/30" : "text-foreground-muted hover:text-foreground")}
+            >
+              <span className="font-mono font-bold">∑</span> LaTeX
+            </button>
+          </div>
+        </div>
+
+        {latexMode ? (
+          <>
+            <p className="text-xs text-foreground-muted mb-3">
+              Usa <code className="bg-surface-2 px-1 rounded text-primary">$...$</code> para matemática en línea y{" "}
+              <code className="bg-surface-2 px-1 rounded text-primary">$$...$$</code> para ecuaciones centradas.
+            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <div>
+                <p className="text-xs text-foreground-muted mb-1.5 font-medium">Código LaTeX</p>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  rows={18}
+                  placeholder={`% Conjuntos
+$I = \\{1,2\\}$: plantas
+$J = \\{P,V,C\\}$: productos
+$T = \\{1,2,3\\}$: períodos
+
+% Parámetros
+$c_{ij}$: costo de producir $j$ en planta $i$
+
+% Variables de decisión
+$x_{ijt} \\geq 0 \\quad \\forall i \\in I, j \\in J, t \\in T$
+$y_{it} \\in \\{0,1\\} \\quad \\forall i \\in I, t \\in T$
+
+% Función objetivo
+$$\\min Z = \\sum_{i \\in I}\\sum_{j \\in J}\\sum_{t \\in T} c_{ij}\\,x_{ijt}$$
+
+% Restricciones
+$$\\sum_{j \\in J} r_{ij}\\,x_{ijt} \\leq \\text{Cap}_i \\cdot y_{it} \\quad \\forall i \\in I, t \\in T$$`}
+                  className="input font-mono text-xs resize-none w-full"
+                  disabled={submitting || submission?.evaluation_status === "complete"}
+                />
+              </div>
+              <div>
+                <p className="text-xs text-foreground-muted mb-1.5 font-medium">Vista previa</p>
+                <div
+                  className="bg-surface-2 rounded-xl border border-border p-4 text-sm leading-relaxed min-h-[18rem] overflow-x-auto"
+                  dangerouslySetInnerHTML={{ __html: content ? renderedLatex : '<span class="text-foreground-muted/50 text-xs italic">La vista previa aparece aquí mientras escribes...</span>' }}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-xs text-foreground-muted mb-3">Escribe tu modelo completo. Puedes usar notación matemática (ej: x₁, ≤, Σᵢ, ∀i∈I, Max, Min).</p>
+            <textarea
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              rows={14}
+              placeholder={`Conjuntos (si aplica):
 I = {1,...,m}: descripción
 J = {1,...,n}: descripción
 
 Parámetros (si aplica):
 cᵢⱼ = costo de ... para i∈I, j∈J
-dⱼ  = demanda de ...
 
 Variables de decisión:
-xᵢⱼ ≥ 0: unidades de j producidas en i   ∀i∈I, j∈J
+xᵢⱼ ≥ 0: unidades de j en i   ∀i∈I, j∈J
 yᵢ ∈ {0,1}: 1 si ...
 
 Función objetivo:
 Min Z = ΣᵢΣⱼ cᵢⱼ·xᵢⱼ  +  ...
 
 Restricciones:
-Σⱼ aᵢⱼ·xᵢⱼ ≤ bᵢ   ∀i∈I   (descripción)
-Σᵢ xᵢⱼ = dⱼ        ∀j∈J   (descripción)
+Σⱼ aᵢⱼ·xᵢⱼ ≤ bᵢ   ∀i∈I
 xᵢⱼ ≥ 0, yᵢ ∈ {0,1}`}
-          className="input font-mono text-sm resize-none"
-          disabled={submitting || submission?.evaluation_status === "complete"}
-        />
+              className="input font-mono text-sm resize-none"
+              disabled={submitting || submission?.evaluation_status === "complete"}
+            />
+          </>
+        )}
+
         {!submission && (
           <button
             onClick={handleSubmit}
