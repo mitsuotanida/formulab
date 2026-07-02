@@ -77,7 +77,7 @@ def submit_formulation(
     if not ex:
         raise HTTPException(404, "Ejercicio no encontrado")
 
-    MAX_ATTEMPTS_PER_DAY = 3
+    MAX_ATTEMPTS_PER_DAY = 5
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     attempts_today = db.query(Submission).filter(
         Submission.user_id == user.id,
