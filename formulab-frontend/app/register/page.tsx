@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [form, setForm] = useState({ name: "", nickname: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -27,7 +28,7 @@ export default function RegisterPage() {
         password: form.password,
       });
       storeSession(data.access_token, data.refresh_token, data.user);
-      router.replace("/dashboard");
+      setRegistered(true);
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { detail?: string } } })?.response?.data?.detail;
       setError(msg || "Error al registrar usuario");
@@ -47,6 +48,20 @@ export default function RegisterPage() {
           <p className="text-foreground-muted mt-2">Crea tu cuenta de estudiante</p>
         </div>
 
+        {registered ? (
+          <div className="card text-center space-y-4">
+            <div className="text-5xl">📬</div>
+            <h2 className="text-xl font-semibold">¡Revisa tu correo!</h2>
+            <p className="text-foreground-muted text-sm">
+              Enviamos un enlace de verificación a <span className="text-foreground font-medium">{form.email}</span>.
+              Haz clic en el enlace para activar tu cuenta.
+            </p>
+            <p className="text-foreground-muted text-xs">Si no ves el correo, revisa tu carpeta de spam.</p>
+            <button onClick={() => router.replace("/dashboard")} className="btn-primary w-full">
+              Continuar al dashboard
+            </button>
+          </div>
+        ) : (
         <div className="card">
           <h2 className="text-xl font-semibold mb-6">Registro</h2>
           {error && (
@@ -88,6 +103,7 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
+        )}
       </div>
     </div>
   );

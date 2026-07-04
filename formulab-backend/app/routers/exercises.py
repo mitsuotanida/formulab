@@ -98,7 +98,7 @@ def generate_exercise(body: ExerciseGenerateRequest, teacher: User = Depends(req
         "type": body.type,
         "difficulty": body.difficulty,
         "ra_ids": data.get("ra_ids", body.ra_focus),
-        "hints": [],
+        "hints": data.get("hints", []),
         "reference_solution": data.get("reference_solution"),
         "ai_generated": True,
         "generation_params": {"type": body.type, "domain": body.domain, "difficulty": body.difficulty, "ra_focus": body.ra_focus},

@@ -9,6 +9,7 @@ export interface User {
   xp: number;
   level: number;
   streak: number;
+  is_verified: boolean;
 }
 
 export function getStoredUser(): User | null {

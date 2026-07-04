@@ -32,6 +32,19 @@ export default function DashboardPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
+  const [resending, setResending] = useState(false);
+  const [resentOk, setResentOk] = useState(false);
+
+  async function resendVerification() {
+    if (!user) return;
+    setResending(true);
+    try {
+      await api.post("/auth/resend-verification", { email: user.email });
+      setResentOk(true);
+    } finally {
+      setResending(false);
+    }
+  }
 
   useEffect(() => {
     if (!user) { router.replace("/login"); return; }
@@ -48,6 +61,24 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
+      {!user.is_verified && (
+        <div className="bg-accent-warn/10 border border-accent-warn/40 rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <p className="text-accent-warn font-medium text-sm">⚠️ Verifica tu cuenta</p>
+            <p className="text-foreground-muted text-xs mt-0.5">
+              Revisa tu email y haz clic en el enlace de verificación para activar todas las funciones.
+            </p>
+          </div>
+          {resentOk ? (
+            <span className="text-accent text-sm shrink-0">✅ Enlace reenviado</span>
+          ) : (
+            <button onClick={resendVerification} disabled={resending} className="btn-secondary text-sm shrink-0 whitespace-nowrap">
+              {resending ? "Enviando..." : "Reenviar enlace"}
+            </button>
+          )}
+        </div>
+      )}
+
       <div>
         <h1 className="text-2xl font-bold">Hola, {user.nickname || user.name.split(" ")[0]} 👋</h1>
         <p className="text-foreground-muted mt-1">Bienvenido a FormuLab — CII 2750 Optimización</p>

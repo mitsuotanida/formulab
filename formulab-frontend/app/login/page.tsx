@@ -65,12 +65,19 @@ export default function LoginPage() {
               {loading ? "Iniciando sesión..." : "Ingresar"}
             </button>
           </form>
-          <p className="text-center text-foreground-muted text-sm mt-4">
-            ¿No tienes cuenta?{" "}
-            <Link href="/register" className="text-primary hover:text-primary-light transition-colors">
-              Regístrate aquí
-            </Link>
-          </p>
+          <div className="mt-4 space-y-2 text-center text-sm text-foreground-muted">
+            <p>
+              <Link href="/forgot-password" className="text-primary hover:text-primary-light transition-colors">
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </p>
+            <p>
+              ¿No tienes cuenta?{" "}
+              <Link href="/register" className="text-primary hover:text-primary-light transition-colors">
+                Regístrate aquí
+              </Link>
+            </p>
+          </div>
         </div>
 
         <p className="text-center text-foreground-muted text-xs mt-6">

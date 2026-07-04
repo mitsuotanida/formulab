@@ -19,6 +19,11 @@ class User(Base):
     level: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     streak: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     last_active_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    is_verified: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default='false')
+    verification_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    verification_token_expires: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    reset_token: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    reset_token_expires: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
 

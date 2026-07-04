@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     refresh_token_expire_days: int = 30
     cors_origins: List[str] = ["http://localhost:3000", "https://formulabs.vercel.app"]
     environment: str = "development"
+    resend_api_key: str = ""
+    frontend_url: str = "http://localhost:3000"
+    from_email: str = "FormuLab <noreply@formulab.app>"
 
     class Config:
         env_file = ".env"

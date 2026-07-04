@@ -1,4 +1,5 @@
 import hashlib
+import secrets
 import uuid
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
@@ -28,7 +29,17 @@ def register_user(db: Session, email: str, name: str, password: str, nickname: s
     existing = db.query(User).filter(User.email == email).first()
     if existing:
         raise ValueError("Email ya registrado")
-    user = User(email=email, name=name, password_hash=hash_password(password), nickname=nickname or None)
+    token = secrets.token_urlsafe(32)
+    expires = datetime.now(timezone.utc) + timedelta(hours=24)
+    user = User(
+        email=email,
+        name=name,
+        password_hash=hash_password(password),
+        nickname=nickname or None,
+        is_verified=False,
+        verification_token=token,
+        verification_token_expires=expires,
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -98,3 +109,55 @@ def get_current_user(db: Session, token: str) -> User:
     if not user:
         raise ValueError("Usuario no encontrado")
     return user
+
+
+def verify_email_token(db: Session, token: str) -> User:
+    user = db.query(User).filter(
+        User.verification_token == token,
+        User.verification_token_expires > datetime.now(timezone.utc),
+        User.is_verified == False,
+    ).first()
+    if not user:
+        raise ValueError("El enlace de verificación es inválido o ya expiró")
+    user.is_verified = True
+    user.verification_token = None
+    user.verification_token_expires = None
+    db.commit()
+    return user
+
+
+def resend_verification_email(db: Session, email: str) -> str | None:
+    user = db.query(User).filter(User.email == email, User.is_verified == False).first()
+    if not user:
+        return None
+    token = secrets.token_urlsafe(32)
+    user.verification_token = token
+    user.verification_token_expires = datetime.now(timezone.utc) + timedelta(hours=24)
+    db.commit()
+    return token
+
+
+def request_password_reset(db: Session, email: str) -> tuple[str, str] | None:
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return None
+    token = secrets.token_urlsafe(32)
+    user.reset_token = token
+    user.reset_token_expires = datetime.now(timezone.utc) + timedelta(minutes=15)
+    db.commit()
+    return token, user.name
+
+
+def reset_password(db: Session, token: str, new_password: str) -> None:
+    user = db.query(User).filter(
+        User.reset_token == token,
+        User.reset_token_expires > datetime.now(timezone.utc),
+    ).first()
+    if not user:
+        raise ValueError("El enlace de restablecimiento es inválido o ya expiró")
+    user.password_hash = hash_password(new_password)
+    user.reset_token = None
+    user.reset_token_expires = None
+    # Revoke all refresh tokens for security
+    db.query(RefreshToken).filter(RefreshToken.user_id == user.id).update({"revoked": True})
+    db.commit()
