@@ -2,10 +2,14 @@ SYSTEM_PROMPT = """Eres un asistente experto en investigación de operaciones y 
 
 REGLA CRÍTICA: Los problemas son ÚNICAMENTE de FORMULACIÓN del modelo matemático. Los estudiantes NO deben resolver el modelo, solo formularlo (definir variables, función objetivo y restricciones). Nunca incluyas la solución óptima, valores óptimos, ni métodos de solución (no simplex, no gráfico, no KKT).
 
+CONTEXTO PREFERIDO: Usa empresas y escenarios del sector tecnológico: startups SaaS, plataformas cloud (estilo AWS/Azure), data centers, CDN, fintech, e-commerce, empresas de software, telecomunicaciones, ciberseguridad, plataformas de streaming, etc. Si el dominio no es tech, usa empresas latinoamericanas reconocidas (Falabella, Entel, Mercado Libre, Rappi, etc.).
+
+REGLA DE ENUNCIADO AUTOCONTENIDO: El enunciado debe incluir TODOS los datos necesarios para formular la solución completa. Un estudiante que lea el enunciado debe poder inferir directamente las variables, la función objetivo y cada restricción, sin ambigüedades.
+
 ESTRUCTURA DEL OUTPUT: Responde ÚNICAMENTE con un JSON válido con esta estructura exacta:
 {
-  "title": "Título descriptivo del problema (máx 80 caracteres)",
-  "description": "Narrativa completa del problema con todos los datos necesarios. Usa contexto industrial chileno o latinoamericano.",
+  "title": "Título descriptivo del problema – NombreEmpresa (máx 80 caracteres)",
+  "description": "Narrativa completa y autocontenida. Todos los parámetros deben estar definidos (con nombre, valor o notación) en el texto o en la tabla.",
   "data_table": {
     "headers": ["columna1", "columna2", ...],
     "rows": [["val1", "val2", ...], ...]
@@ -14,20 +18,20 @@ ESTRUCTURA DEL OUTPUT: Responde ÚNICAMENTE con un JSON válido con esta estruct
   "ra_ids": [1, 2, 3],
   "reference_solution": {
     "variables": "definición de variables con unidades",
-    "objective": "función objetivo con dirección y expresión",
-    "constraints": "lista de restricciones con interpretación"
+    "objective": "función objetivo con dirección y expresión matemática completa",
+    "constraints": "lista de restricciones con interpretación en lenguaje natural"
   }
 }
 
 Si el problema no necesita tabla de datos, omite data_table (null).
 
 GUÍA DE CALIDAD:
-- LP fácil: 2-3 variables, 2-4 restricciones, dominio cotidiano
-- LP/MIP medio: 3-5 variables, 4-7 restricciones
+- LP fácil: 2-3 variables, 2-4 restricciones, contexto tech cotidiano
+- LP/MIP medio: 3-5 variables, 4-7 restricciones, contexto operacional tech
 - MIP/NLP difícil: variables binarias o no linealidades explícitas, 5-10 restricciones
-- Para MIP: incluir al menos una variable binaria con lógica de sí/no o todo-o-nada
-- Para NLP: incluir valor absoluto, producto de variables, o función cuadrática
-- Usar empresas o contextos chilenos/latinoamericanos (Codelco, LAN, Falabella, etc.)
+- Para MIP: incluir al menos una variable binaria con lógica de sí/no, todo-o-nada, o costos fijos
+- Para NLP: incluir valor absoluto (linealizable), función cuadrática, o producto de variables
+- Cohesión: cada dato numérico en el enunciado debe aparecer en exactamente una restricción o en el objetivo
 """
 
 FEW_SHOT_EXAMPLES = [
@@ -38,22 +42,22 @@ FEW_SHOT_EXAMPLES = [
     {
         "role": "assistant",
         "content": """{
-  "title": "Producción de Muebles Artesanales en Mueblería Andina",
-  "description": "Mueblería Andina fabrica dos productos: sillas (S) y mesas (M). Cada silla requiere 2 hrs de carpintería y 1 hr de pintura. Cada mesa requiere 4 hrs de carpintería y 2 hrs de pintura. Diariamente se dispone de 40 hrs de carpintería y 20 hrs de pintura. La utilidad neta es $8.000 por silla y $14.000 por mesa. La empresa desea planificar la producción diaria para maximizar la utilidad.",
+  "title": "Procesamiento de tareas en servidores cloud – NexusCloud",
+  "description": "NexusCloud procesa dos tipos de tareas en su infraestructura cloud: renderizado de video (R) y entrenamiento de modelos ML (M). Dispone de dos clusters de servidores: Cluster A (CA) y Cluster B (CB), con 10 horas diarias de operación cada uno. Las tasas de procesamiento [tareas/hora] son: CA procesa 4 tareas R y 6 tareas M por hora; CB procesa 5 tareas R y 3 tareas M por hora. El ingreso neto por tarea completada es $12 para R y $9 para M. Determine cuántas tareas de cada tipo procesar diariamente para maximizar el ingreso neto total sin exceder la disponibilidad de ningún cluster.",
   "data_table": {
-    "headers": ["Recurso", "Silla (S)", "Mesa (M)", "Disponibilidad/día"],
+    "headers": ["Cluster", "Renderizado R (tar/hr)", "ML Entrenamiento M (tar/hr)", "Disponibilidad"],
     "rows": [
-      ["Carpintería (hrs)", "2", "4", "40"],
-      ["Pintura (hrs)", "1", "2", "20"],
-      ["Utilidad neta ($)", "8.000", "14.000", ""]
+      ["Cluster A (CA)", "4", "6", "10 hr/día"],
+      ["Cluster B (CB)", "5", "3", "10 hr/día"],
+      ["Ingreso neto ($/tarea)", "12", "9", ""]
     ]
   },
-  "question": "Formule el modelo de programación lineal para maximizar la utilidad diaria total de Mueblería Andina. Defina claramente las variables de decisión, la función objetivo y todas las restricciones del problema.",
+  "question": "Formule el modelo de programación lineal que maximiza el ingreso neto diario de NexusCloud. Defina las variables de decisión, la función objetivo y todas las restricciones.",
   "ra_ids": [1, 2, 3],
   "reference_solution": {
-    "variables": "S = número de sillas producidas por día (unidades/día)\\nM = número de mesas producidas por día (unidades/día)",
-    "objective": "Max Z = 8.000·S + 14.000·M",
-    "constraints": "2S + 4M ≤ 40  (disponibilidad carpintería)\\n1S + 2M ≤ 20  (disponibilidad pintura)\\nS ≥ 0, M ≥ 0  (no negatividad)"
+    "variables": "xR = tareas de renderizado procesadas por día\\nxM = tareas de entrenamiento ML procesadas por día",
+    "objective": "Max Z = 12·xR + 9·xM",
+    "constraints": "(1/4)xR + (1/6)xM <= 10  (disponibilidad CA)\\n(1/5)xR + (1/3)xM <= 10  (disponibilidad CB)\\nxR >= 0, xM >= 0  (no negatividad)"
   }
 }""",
     },
@@ -64,22 +68,22 @@ FEW_SHOT_EXAMPLES = [
     {
         "role": "assistant",
         "content": """{
-  "title": "Apertura de Centros de Distribución en la Región Metropolitana",
-  "description": "LogiChile debe abastecer 3 ciudades (Maipú: 45 ton/mes, Puente Alto: 35 ton/mes, San Bernardo: 30 ton/mes) desde potenciales centros de distribución (CD) en Pudahuel, Lo Espejo y Quilicura. Abrir cada CD tiene un costo fijo mensual. Si se abre un CD, puede enviar hasta su capacidad máxima. Cada ciudad debe ser abastecida completamente.",
+  "title": "Ubicación de nodos de caché para red CDN – EdgeFlow",
+  "description": "EdgeFlow debe atender la demanda de contenido de 3 regiones de usuarios: Región Norte (50 TB/mes), Región Centro (40 TB/mes), Región Sur (30 TB/mes). Evalúa instalar nodos de caché (NC) en tres ubicaciones: Iquique (NC1), Santiago (NC2) y Concepción (NC3). Instalar cada NC tiene un costo fijo mensual. Si se instala, puede transmitir hasta su capacidad máxima. Cada región debe recibir toda su demanda de contenido. Los costos de transmisión por TB desde cada NC a cada región se muestran en la tabla.",
   "data_table": {
-    "headers": ["CD", "Costo fijo ($/mes)", "Cap. máx (ton/mes)", "Costo transp. Maipú", "Costo transp. P.Alto", "Costo transp. S.Bernardo"],
+    "headers": ["Nodo Caché", "Costo fijo (M$/mes)", "Cap. máx (TB/mes)", "Costo R.Norte ($/TB)", "Costo R.Centro ($/TB)", "Costo R.Sur ($/TB)"],
     "rows": [
-      ["Pudahuel", "2.500.000", "80", "120", "200", "150"],
-      ["Lo Espejo", "1.800.000", "60", "180", "130", "90"],
-      ["Quilicura", "2.100.000", "70", "160", "110", "200"]
+      ["Iquique (NC1)", "1.200.000", "90", "100", "250", "180"],
+      ["Santiago (NC2)", "1.800.000", "120", "200", "80", "120"],
+      ["Concepción (NC3)", "1.000.000", "70", "220", "150", "90"]
     ]
   },
-  "question": "Formule el modelo de programación entera mixta (MIP) que minimiza el costo total (fijo + transporte). Defina variables continuas y binarias, la función objetivo y todas las restricciones incluyendo las restricciones de enlace.",
+  "question": "Formule el MIP que minimiza el costo total mensual (fijo + transmisión). Defina variables continuas xij [TB] y binarias yi, la función objetivo y todas las restricciones incluyendo las restricciones de enlace.",
   "ra_ids": [4, 5],
   "reference_solution": {
-    "variables": "x_{ij} = toneladas enviadas desde CD i a ciudad j (continua, ≥ 0)\\ny_i = 1 si se abre el CD i, 0 si no (binaria)",
-    "objective": "Min Z = 2.500.000·y₁ + 1.800.000·y₂ + 2.100.000·y₃ + 120x₁₁ + 200x₁₂ + 150x₁₃ + 180x₂₁ + 130x₂₂ + 90x₂₃ + 160x₃₁ + 110x₃₂ + 200x₃₃",
-    "constraints": "Demanda: x₁ⱼ + x₂ⱼ + x₃ⱼ = dⱼ para cada ciudad j\\nCapacidad: Σⱼ xᵢⱼ ≤ Capᵢ·yᵢ para cada CD i\\nNo negatividad: xᵢⱼ ≥ 0\\nBinariedad: yᵢ ∈ {0,1}"
+    "variables": "xij = TB enviados del NC i a la región j (continua, >= 0)\\nyi = 1 si se instala el NC i, 0 si no (binaria)",
+    "objective": "Min Z = 1.200.000·y1 + 1.800.000·y2 + 1.000.000·y3 + Sum_ij cij·xij",
+    "constraints": "Sum_i xij = dj  para cada región j  (demanda completa)\\nSum_j xij <= Capi·yi  para cada NC i  (capacidad + enlace con instalación)\\nxij >= 0, yi en {0,1}"
   }
 }""",
     },
