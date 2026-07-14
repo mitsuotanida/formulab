@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: formulab-backend
+    runtime: docker
+    dockerfilePath: ./formulab-backend/Dockerfile
+    dockerContext: ./formulab-backend
+    plan: free
+    healthCheckPath: /api/v1/exercises
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: REFRESH_SECRET_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        value: '["https://formulabs.vercel.app","https://formulabs-git-main-mitsuotanidas-projects.vercel.app"]'
+      - key: ENVIRONMENT
+        value: production
+      - key: RESEND_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        value: https://formulabs.vercel.app
