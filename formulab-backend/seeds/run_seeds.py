@@ -26,13 +26,17 @@ def run():
                 name=TEACHER_NAME,
                 password_hash=hash_password(TEACHER_PASSWORD),
                 role="teacher",
+                is_verified=True,
             )
             db.add(teacher)
             db.commit()
             db.refresh(teacher)
-            print(f"✓ Profesor creado: {TEACHER_EMAIL} / {TEACHER_PASSWORD}")
+            print(f"Profesor creado: {TEACHER_EMAIL}")
         else:
-            print(f"✓ Profesor ya existe: {TEACHER_EMAIL}")
+            teacher.password_hash = hash_password(TEACHER_PASSWORD)
+            teacher.is_verified = True
+            db.commit()
+            print(f"Profesor actualizado: {TEACHER_EMAIL}")
 
         seed_badges(db)
         seed_exercises(db, teacher.id)
