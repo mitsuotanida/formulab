@@ -4,7 +4,7 @@ from app.config import settings
 
 def _send(to: str, subject: str, html: str) -> bool:
     if not settings.resend_api_key:
-        print(f"[EMAIL DISABLED — configure RESEND_API_KEY to send]\nTo: {to}\nSubject: {subject}")
+        print(f"[EMAIL DEV] To: {to} (RESEND_API_KEY not set — skipping send)")
         return True
     try:
         resp = httpx.post(
