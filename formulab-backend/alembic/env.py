@@ -6,8 +6,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+def _normalize_db_url(url: str) -> str:
+    """Force the sync psycopg2 driver (mirrors app/database.py)."""
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql+asyncpg://"):
+        url = "postgresql://" + url[len("postgresql+asyncpg://"):]
+    return url
+
+
 config = context.config
-config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+config.set_main_option("sqlalchemy.url", _normalize_db_url(os.environ["DATABASE_URL"]))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
