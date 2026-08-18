@@ -5,7 +5,7 @@ services:
     dockerfilePath: ./formulab-backend/Dockerfile
     dockerContext: ./formulab-backend
     plan: free
-    healthCheckPath: /api/v1/exercises
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         sync: false
