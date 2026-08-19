@@ -30,13 +30,23 @@ badge_condition_type = sa.Enum(
 
 
 def upgrade() -> None:
-    # If the schema was already created by an earlier deploy (the users table
-    # exists), skip the initial creation and just let Alembic record this
-    # revision as applied. Migrations 0002/0003 are idempotent and will add any
-    # columns still missing, converging the schema to head.
     bind = op.get_bind()
-    if "users" in sa.inspect(bind).get_table_names():
-        return
+    insp = sa.inspect(bind)
+    if "users" in insp.get_table_names():
+        cols = {c["name"] for c in insp.get_columns("users")}
+        if "name" in cols:
+            # Full, healthy schema already present — nothing to create.
+            return
+        # A partial/legacy `users` table exists (missing core columns, so it
+        # cannot hold valid application data). Drop the incomplete app tables and
+        # enum types so the correct schema is rebuilt below. Runs once; healthy
+        # databases skip this branch on every future deploy.
+        for t in ("ra_tracking", "user_badges", "submissions", "refresh_tokens",
+                  "exercises", "badges", "users"):
+            op.execute(f'DROP TABLE IF EXISTS "{t}" CASCADE')
+        for e in ("badge_condition_type", "exercise_domain", "exercise_difficulty",
+                  "exercise_type", "user_role"):
+            op.execute(f"DROP TYPE IF EXISTS {e} CASCADE")
 
     op.create_table(
         "users",
