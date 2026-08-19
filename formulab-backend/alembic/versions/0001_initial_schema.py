@@ -30,6 +30,14 @@ badge_condition_type = sa.Enum(
 
 
 def upgrade() -> None:
+    # If the schema was already created by an earlier deploy (the users table
+    # exists), skip the initial creation and just let Alembic record this
+    # revision as applied. Migrations 0002/0003 are idempotent and will add any
+    # columns still missing, converging the schema to head.
+    bind = op.get_bind()
+    if "users" in sa.inspect(bind).get_table_names():
+        return
+
     op.create_table(
         "users",
         sa.Column("id", postgresql.UUID(as_uuid=True), primary_key=True, server_default=sa.text("gen_random_uuid()")),
