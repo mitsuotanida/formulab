@@ -8,7 +8,13 @@ const ALWAYS_PUBLIC = ["/verify-email", "/forgot-password", "/reset-password"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("access_token")?.value;
+  // Session is alive if EITHER token is present. The access token is short-lived
+  // (1h); the refresh token lasts 30 days and the API client silently refreshes
+  // the access token on demand. Checking only the access token would bounce the
+  // user to /login on every navigation once it expires — even mid-session.
+  const token =
+    request.cookies.get("access_token")?.value ||
+    request.cookies.get("refresh_token")?.value;
 
   if (ALWAYS_PUBLIC.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
